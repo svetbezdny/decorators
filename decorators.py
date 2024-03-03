@@ -28,8 +28,8 @@ def logging(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        params = args + tuple(kwargs.items())
         result = func(*args, **kwargs)
+        params = args + tuple(kwargs.items())
         if params:
             print(f"Функция была вызвана c параметрами: {params}")
         else:
@@ -52,7 +52,7 @@ def counter(func):
         if 2 <= calls_qty % 10 <= 4 and (calls_qty % 100 < 12 or calls_qty % 100 > 14):
             print(f"Функция была вызвана {calls_qty} раза")
         else:
-            print(f"Функция была вызвана {calls_qty} раз без параметров")
+            print(f"Функция была вызвана {calls_qty} раз")
 
         return func(*args, **kwargs)
 
@@ -73,52 +73,3 @@ def memo(func):
         return cache[k]
 
     return fmemo
-
-
-def full_info(func):
-    """
-    Декоратор, который:
-        - выводит время, которое заняло на выполнение функции
-        - выводит параметры с которыми была вызвана функция
-        - выводит количество вызовов функции
-        - запоминает результаты исполнения функции
-    """
-
-    calls_qty = 0
-    cache = {}
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        nonlocal calls_qty
-        calls_qty += 1
-        start = perf_counter()
-        params = args + tuple(kwargs.items())
-        k = (args, frozenset(kwargs.items()))
-        if k not in cache:
-            cache[k] = func(*args, **kwargs)
-        end = perf_counter()
-        if 2 <= calls_qty % 10 <= 4 and (calls_qty % 100 < 12 or calls_qty % 100 > 14):
-            if params:
-                print(
-                    f"Функция {func.__name__} была вызвана {calls_qty} раза c параметрами: {params}"
-                )
-            else:
-                print(
-                    f"Функция {func.__name__} была вызвана {calls_qty} раза без параметров"
-                )
-        else:
-            if params:
-                print(
-                    f"Функция {func.__name__} была вызвана {calls_qty} раз c параметрами: {params}"
-                )
-            else:
-                print(
-                    f"Функция {func.__name__} была вызвана {calls_qty} раз без параметров"
-                )
-        print(
-            f"Время выполнения функции {func.__name__}: {timedelta(seconds=end-start)}"
-        )
-
-        return cache[k]
-
-    return wrapper
